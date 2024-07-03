@@ -6,20 +6,23 @@
     <title>QUIZ REGISTRATION</title>
     <style>
         body {
-            background-color: white;
+            background-color: #f0f4f8;
             font-family: Arial, sans-serif;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
+            margin: 0;
         }
         form {
-            background-color: rgb(246, 243, 237);
-            padding: 20px 40px;
+            background-color: #ffffff;
+            padding: 20px 40px 50px ;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             max-width: 400px;
             width: 100%;
+            margin-bottom: 40px;
         }
         h1 {
             text-align: center;
@@ -33,7 +36,7 @@
         }
         input[type="text"],
         select {
-           width: 400px;
+            width: calc(100% - 22px);
             padding: 10px;
             margin-bottom: 15px;
             border: 1px solid #ccc;
@@ -53,6 +56,7 @@
         button:hover {
             background-color: #004d40;
         }
+       
         
     </style>
 </head>
@@ -74,6 +78,7 @@
     </form>
     <div class="rules">
         <ul>
+            <p style="text-align: center;">RULES</p>
             <li>The quiz contains 20 questions</li>
             <li>Wrong answer does not carry any negative marks</li>
             <li>Submit it within the timer ends</li>

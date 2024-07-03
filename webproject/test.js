@@ -69,13 +69,24 @@ function renderPage(page) {
     const question = quizData[i].question;
     const options = quizData[i].options;
     container.innerHTML += `<h2>${question}</h2>`;
-    options.forEach((option, index) => {
-      container.innerHTML += `
-        <div>
-          <input type="radio" name="option${i}" id="option${i}-${index}" value="${index}" ${selectedAnswers[i] === index ? 'checked' : ''}>
-          <label for="option${i}-${index}">${option}</label>
-        </div>`;
-    });
+
+    if (i < 15) {
+      options.forEach((option, index) => {
+        container.innerHTML += `
+          <div>
+            <input type="radio" name="option${i}" id="option${i}-${index}" value="${index}" ${selectedAnswers[i] === index ? 'checked' : ''}>
+            <label for="option${i}-${index}">${option}</label>
+          </div>`;
+      });
+    } else {
+      options.forEach((option, index) => {
+        container.innerHTML += `
+          <div>
+            <input type="checkbox" name="option${i}" id="option${i}-${index}" value="${index}" ${selectedAnswers[i] && selectedAnswers[i].includes(index) ? 'checked' : ''}>
+            <label for="option${i}-${index}">${option}</label>
+          </div>`;
+      });
+    }
   }
 
   if (page === Math.ceil(quizData.length / questionsPerPage) - 1) {
@@ -85,9 +96,14 @@ function renderPage(page) {
 
 function collectAnswers() {
   for (let i = 0; i < quizData.length; i++) {
-    const selectedOption = document.querySelector(`input[name="option${i}"]:checked`);
-    if (selectedOption) {
-      selectedAnswers[i] = parseInt(selectedOption.value);
+    if (i < 15) {
+      const selectedOption = document.querySelector(`input[name="option${i}"]:checked`);
+      if (selectedOption) {
+        selectedAnswers[i] = parseInt(selectedOption.value);
+      }
+    } else {
+      const checkboxes = document.querySelectorAll(`input[name="option${i}"]:checked`);
+      selectedAnswers[i] = Array.from(checkboxes).map(checkbox => parseInt(checkbox.value));
     }
   }
 }
@@ -95,15 +111,30 @@ function collectAnswers() {
 function validateAllAnswers() {
   const resultContainer = document.getElementById('result');
   resultContainer.innerHTML = '';
-  resultContainer.innerHTML += `<p> YOUR QUIZ RESULTS </p>`
+  resultContainer.innerHTML += `<p>YOUR QUIZ RESULTS</p>`;
+  
   let score = 0;
+  
   for (let i = 0; i < quizData.length; i++) {
     if (selectedAnswers[i] !== null) {
-      if (selectedAnswers[i] === quizData[i].correct) {
-        resultContainer.innerHTML += `<p class="correct">Question ${i + 1}: Correct!</p>`;
-        score++;
+      if (i < 15) {
+        if (selectedAnswers[i] === quizData[i].correct) {
+          resultContainer.innerHTML += `<p class="correct">Question ${i + 1}: Correct!</p>`;
+          score++;
+        } else {
+          resultContainer.innerHTML += `<p class="incorrect">Question ${i + 1}: Incorrect. Correct answer is ${quizData[i].options[quizData[i].correct]}.</p>`;
+        }
       } else {
-        resultContainer.innerHTML += `<p class="incorrect">Question ${i + 1}: Incorrect. Correct answer is ${quizData[i].options[quizData[i].correct]}.</p>`;
+        const correctAnswers = Array.isArray(quizData[i].correct) ? quizData[i].correct : [quizData[i].correct];
+        const selectedCorrectAnswers = selectedAnswers[i].filter(answer => correctAnswers.includes(answer));
+        
+        if (selectedCorrectAnswers.length === correctAnswers.length && selectedCorrectAnswers.every((val, index) => val === correctAnswers[index])) {
+          resultContainer.innerHTML += `<p class="correct">Question ${i + 1}: Correct!</p>`;
+          score++;
+        } else {
+          const correctOptions = correctAnswers.map(index => quizData[i].options[index]).join(', ');
+          resultContainer.innerHTML += `<p class="incorrect">Question ${i + 1}: Incorrect. Correct answer(s) are ${correctOptions}.</p>`;
+        }
       }
     } else {
       resultContainer.innerHTML += `<p class="not-selected">Question ${i + 1}: No answer selected.</p>`;
@@ -112,6 +143,7 @@ function validateAllAnswers() {
 
   alert(`Quiz submitted! Your score is ${score} out of ${quizData.length}`);
 }
+
 
 function submitQuiz() {
   collectAnswers();

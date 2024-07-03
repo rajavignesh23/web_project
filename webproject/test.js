@@ -50,6 +50,7 @@ const quizData = [
   { question: "What is the official name for the “prove you’re not a robot” tests that websites sometimes require?", options: ["CAPTCHA", "ReCAPTCHA", "Authentication Test", "Verify-Pass"], correct: 0 },
   { question: "Which University offered the first-ever academic programme in Computer Science? Which University offered the first-ever academic programme in Computer Science?", options: ["MIT", "Prude university", "Harvard", "Stanford"], correct: 0 },
   { question: "Sonos .Inc , an American based company , what is it famous for?", options: ["Speakers", "Camera", "Keyboard", "Display"], correct: 0 },
+  {}
 ];
 
 const questionsPerPage = 5;

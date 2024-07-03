@@ -16,3 +16,7 @@ script.js: The JavaScript file containing the logic for the quiz.
 
 Regisration page:
 ![Screenshot 2024-07-03 203610](https://github.com/rajavignesh23/web_project/assets/139878847/b81ccf0e-8d18-4e08-aed2-d6b354917024)
+
+Quiz website with timer synced across pages:
+
+  ![Screenshot 2024-07-03 203659](https://github.com/rajavignesh23/web_project/assets/139878847/a9078e36-5d60-4fe8-99c2-c54fb7de2525)

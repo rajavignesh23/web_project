@@ -20,3 +20,8 @@ Regisration page:
 Quiz website with timer synced across pages:
 
   ![Screenshot 2024-07-03 203659](https://github.com/rajavignesh23/web_project/assets/139878847/a9078e36-5d60-4fe8-99c2-c54fb7de2525)
+
+Time up alert and result :
+  `![Screenshot 2024-07-03 203723](https://github.com/rajavignesh23/web_project/assets/139878847/7b2b71c0-bc1d-418d-9e42-b30ba820fa02)
+  ![Screenshot 2024-07-03 203746](https://github.com/rajavignesh23/web_project/assets/139878847/75607132-309d-426b-a0f3-58402afa7e23)
+

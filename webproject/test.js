@@ -1,4 +1,4 @@
-const time = 10; // 10 minutes
+const time = 10; 
 let intervalId;
 
 document.addEventListener('DOMContentLoaded', function() {

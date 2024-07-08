@@ -7,12 +7,12 @@ document.addEventListener('DOMContentLoaded', function() {
   const prevBtn = document.getElementById('prev');
   const nextBtn = document.getElementById('next');
   const resultContainer = document.getElementById('result');
-
+  
   let currentPage = 0;
   const questionsPerPage = 5;
   let selectedAnswers = [];
   let quizData = [];
-
+  
   function initializeTimer() {
     let endTime = localStorage.getItem('endTime');
     if (!endTime) {

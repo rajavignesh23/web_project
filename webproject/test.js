@@ -1,8 +1,8 @@
-const time = 10; 
+const time = 10;
 const quizData = [
   {
     "question": "What is the name of the algorithm used by GPT-4?",
-    "inputType": "checkbox", 
+    "inputType": "radio", 
     "options": [
       { "text": "Generative Adversarial Network" },
       { "text": "Artificial Neural Network" },
@@ -134,7 +134,7 @@ const quizData = [
   },
   {
     "question": "Python, known for its multi-purpose and dead slow execution, but this parallel computing model enhanced its speed, what is it?",
-    "inputType": "checkbox",
+    "inputType": "radio",
     "options": [
       { "text": "CUDA" },
       { "text": "Tensor" },
@@ -200,7 +200,7 @@ const quizData = [
   },
   {
     "question": "Which University offered the first-ever academic program in Computer Science?",
-    "inputType": "checkbox",
+    "inputType": "radio",
     "options": [
       { "text": "MIT" },
       { "text": "Prude university" },
@@ -225,32 +225,25 @@ const questionsPerPage = 5;
 let currentPage = 0;
 let selectedAnswers = Array(quizData.length).fill(null);
 let intervalId;
+let remainingTime;
 
 function initializeTimer() {
-  const endTime = localStorage.getItem('endTime');
-  if (!endTime) {
-    const newEndTime = Date.now() + time * 60 * 1000;
-    localStorage.setItem('endTime', newEndTime);
-  }
+  remainingTime = time * 60 * 1000;
 }
 
 function updateTimer() {
-  const endTime = localStorage.getItem('endTime');
-  if (endTime) {
-    const currentTime = Date.now();
-    const remainingTime = endTime - currentTime;
-    
-    if (remainingTime >= 0) {
-      const minutes = Math.floor((remainingTime / 1000) / 60);
-      let seconds = Math.floor((remainingTime / 1000) % 60);
-      seconds = seconds < 10 ? '0' + seconds : seconds;
-      document.getElementById('cd').innerHTML = `${minutes}:${seconds}`;
-    } else {
-      clearInterval(intervalId);
-      document.getElementById('cd').innerHTML = '0:00';
-      alert('Time is up! Your quiz has ended.');
-      validateAllAnswers();
-    }
+  remainingTime -= 1000;
+
+  if (remainingTime >= 0) {
+    const minutes = Math.floor((remainingTime / 1000) / 60);
+    let seconds = Math.floor((remainingTime / 1000) % 60);
+    seconds = seconds < 10 ? '0' + seconds : seconds;
+    document.getElementById('cd').innerHTML = `${minutes}:${seconds}`;
+  } else {
+    clearInterval(intervalId);
+    document.getElementById('cd').innerHTML = '0:00';
+    alert('Time is up! Your quiz has ended.');
+    validateAllAnswers();
   }
 }
 
@@ -282,8 +275,7 @@ function renderPage(page) {
             <label for="option${i}-${index}">${option.text}</label>
           </div>`;
       });
-    }  
-    else if (inputType === "checkbox") {
+    } else if (inputType === "checkbox") {
       options.forEach((option, index) => {
         container.innerHTML += `
           <div>
@@ -300,31 +292,31 @@ function renderPage(page) {
   if (page === Math.ceil(quizData.length / questionsPerPage) - 1) {
     nextBtn.style.display = 'none';
     submitBtnContainer.innerHTML = `<button id="submit" onclick="submitQuiz()">Submit</button>`;
-  } 
-  else {
+  } else {
     nextBtn.style.display = 'inline-block';
   }
 }
 
 function collectAnswers() {
   const container = document.getElementById('quiz-container');
-  const inputs = container.querySelectorAll('input[type="radio"]:checked, input[type="checkbox"]:checked, input[type="text"]');
-  
-  inputs.forEach(input => {
+  const radioInputs = container.querySelectorAll('input[type="radio"]:checked');
+  const checkboxInputs = container.querySelectorAll('input[type="checkbox"]');
+
+  radioInputs.forEach(input => {
     const questionIndex = parseInt(input.name.replace('option', ''));
-    const optionIndex = input.value;
-    
-    if (input.type === 'checkbox') {
-      if (!selectedAnswers[questionIndex]) {
-        selectedAnswers[questionIndex] = [];
-      }
-      selectedAnswers[questionIndex].push(parseInt(optionIndex));
-    } 
-    else if (input.type === 'text') {
-      selectedAnswers[questionIndex] = input.value.trim();
-    } 
-    else {
-      selectedAnswers[questionIndex] = parseInt(optionIndex);
+    const optionIndex = parseInt(input.value);
+    selectedAnswers[questionIndex] = optionIndex;
+  });
+
+  quizData.forEach((question, index) => {
+    if (question.inputType === 'checkbox') {
+      const selectedCheckboxes = [];
+      checkboxInputs.forEach(input => {
+        if (input.name.startsWith(`option${index}`) && input.checked) {
+          selectedCheckboxes.push(parseInt(input.value));
+        }
+      });
+      selectedAnswers[index] = selectedCheckboxes.length > 0 ? selectedCheckboxes : null;
     }
   });
 }
@@ -338,40 +330,38 @@ function validateAllAnswers() {
 
   quizData.forEach((question, index) => {
     const selectedAnswer = selectedAnswers[index];
+    const correctAnswer = question.correct;
+    const questionOptions = question.options;
+
     if (selectedAnswer !== null && selectedAnswer !== undefined) {
-      if (Array.isArray(selectedAnswer)) { 
-        const correctOptions = question.correct;
-        const isCorrect = correctOptions.every(option => selectedAnswer.includes(option));
+      if (Array.isArray(selectedAnswer)) {
+        const correctOptions = Array.isArray(correctAnswer) ? correctAnswer : [correctAnswer];
+        const isCorrect = correctOptions.every(option => selectedAnswer.includes(option)) &&
+          correctOptions.length === selectedAnswer.length;
         if (isCorrect) {
           container.innerHTML += `<p class="correct">Question ${index + 1}: Correct!</p>`;
           score++;
-        } 
-        else {
-          const correctAnswers = correctOptions.map(opt => question.options[opt].text).join(', ');
+        } else {
+          const correctAnswers = correctOptions.map(opt => questionOptions[opt].text).join(', ');
           container.innerHTML += `<p class="incorrect">Question ${index + 1}: Incorrect. Correct answer(s): ${correctAnswers}</p>`;
         }
-      } 
-       else if (typeof selectedAnswer === 'number') { 
-        if (selectedAnswer === question.correct) {
+      } else {
+        if (selectedAnswer === correctAnswer) {
           container.innerHTML += `<p class="correct">Question ${index + 1}: Correct!</p>`;
           score++;
-        } 
-        else {
-          container.innerHTML += `<p class="incorrect">Question ${index + 1}: Incorrect. Correct answer: ${question.options[question.correct].text}</p>`;
+        } else {
+          const correctAnswerText = questionOptions[correctAnswer].text;
+          container.innerHTML += `<p class="incorrect">Question ${index + 1}: Incorrect. Correct answer: ${correctAnswerText}</p>`;
         }
-      } 
-      else {
-        container.innerHTML += `<p class="not-selected">Question ${index + 1}: No answer selected.</p>`;
       }
-    } 
-    else {
+    } else {
       container.innerHTML += `<p class="not-selected">Question ${index + 1}: No answer selected.</p>`;
     }
   });
 
   container.innerHTML += `<p>Your score is ${score} out of ${quizData.length}</p>`;
+
   clearInterval(intervalId);
-  localStorage.removeItem('endTime');
 
   document.getElementById('prev').style.display = 'none';
   document.getElementById('next').style.display = 'none';
